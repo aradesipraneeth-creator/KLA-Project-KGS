@@ -8,22 +8,22 @@ import torch
 import torch.nn as nn
 
 try:
-    from losses.charbonnier import CharbonnierLoss
+    from .charbonnier_loss import CharbonnierLoss
 except ImportError:
     try:
         from .charbonnier import CharbonnierLoss
     except ImportError:
-        from .charbonnier_loss import CharbonnierLoss
+        from losses.charbonnier_loss import CharbonnierLoss
 
 try:
-    from losses.ssim_loss import SSIMLoss
-except ImportError:
     from .ssim_loss import SSIMLoss
+except ImportError:
+    from losses.ssim_loss import SSIMLoss
 
 try:
-    from losses.edge_loss import EdgeLoss
-except ImportError:
     from .edge_loss import EdgeLoss
+except ImportError:
+    from losses.edge_loss import EdgeLoss
 
 
 class RestorationLoss(nn.Module):

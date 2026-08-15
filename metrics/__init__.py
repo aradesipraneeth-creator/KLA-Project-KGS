@@ -1,6 +1,11 @@
-from metrics.psnr import calculate_psnr, calculate_batch_psnr
-from metrics.ssim import calculate_ssim, calculate_batch_ssim
-from metrics.lpips_metric import LPIPSMetric, calculate_lpips
+try:
+    from .psnr import calculate_psnr, calculate_batch_psnr
+    from .ssim import calculate_ssim, calculate_batch_ssim
+    from .lpips_metric import LPIPSMetric, calculate_lpips
+except ImportError:
+    from metrics.psnr import calculate_psnr, calculate_batch_psnr
+    from metrics.ssim import calculate_ssim, calculate_batch_ssim
+    from metrics.lpips_metric import LPIPSMetric, calculate_lpips
 
 __all__ = [
     "calculate_psnr",
