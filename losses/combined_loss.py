@@ -6,9 +6,24 @@ Total Loss = lambda1 * L_recon + lambda2 * L_structural + lambda3 * L_edge
 
 import torch
 import torch.nn as nn
-from losses.charbonnier import CharbonnierLoss
-from losses.ssim_loss import SSIMLoss
-from losses.edge_loss import EdgeLoss
+
+try:
+    from losses.charbonnier import CharbonnierLoss
+except ImportError:
+    try:
+        from .charbonnier import CharbonnierLoss
+    except ImportError:
+        from .charbonnier_loss import CharbonnierLoss
+
+try:
+    from losses.ssim_loss import SSIMLoss
+except ImportError:
+    from .ssim_loss import SSIMLoss
+
+try:
+    from losses.edge_loss import EdgeLoss
+except ImportError:
+    from .edge_loss import EdgeLoss
 
 
 class RestorationLoss(nn.Module):
