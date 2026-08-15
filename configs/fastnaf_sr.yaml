@@ -1,0 +1,49 @@
+# FastNAF-SR V5 Master Configuration
+
+model:
+  name: FastNAFSR_V5
+  in_channels: 1
+  out_channels: 1
+  channels: 48
+  num_lr_blocks: 8
+  num_hr_blocks: 4
+  upscale_factor: 2
+
+data:
+  train_root: "train/train"
+  test_root: "Test_NoisyLR/NoisyLR"
+  val_split: 0.1
+  seed: 42
+  patch_size: null  # null uses full 128x128 -> 256x256; or 64 for patch training
+  augment: true
+  num_workers: 0  # 0 for safe multi-platform execution
+  batch_size: 8
+  val_batch_size: 8
+  global_mean: 0.43353602
+  global_std: 0.28478748
+
+loss:
+  recon_type: "charbonnier"
+  lambda_recon: 1.0
+  lambda_ssim: 0.5
+  lambda_edge: 0.05
+  edge_mode: "sobel"
+
+training:
+  epochs: 50
+  lr: 0.001
+  min_lr: 0.000001
+  weight_decay: 0.0001
+  warmup_epochs: 3
+  grad_clip: 1.0
+  amp: true
+  grad_accum_steps: 1
+  ema_decay: 0.999
+  save_dir: "checkpoints"
+  log_dir: "experiments"
+  eval_freq: 1
+
+inference:
+  tile_size: 128
+  tile_overlap: 16
+  use_ema: true

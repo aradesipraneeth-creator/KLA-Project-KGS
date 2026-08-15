@@ -1,0 +1,2 @@
+Precision,Parameters,Checkpoint_MB,Pre_ms,Infer_Mean_ms,Infer_Median_ms,Infer_P95_ms,Post_ms,Total_Pipeline_ms,FPS,GPU_Peak_MB
+FP32,296593,2.41,0.182,3474.786,3568.377,3872.448,1.655,3476.623,0.3,0.0

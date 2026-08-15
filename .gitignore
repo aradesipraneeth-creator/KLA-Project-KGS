@@ -1,0 +1,52 @@
+# ==============================================================================
+# KLA Semiconductor AI Image Restoration — .gitignore
+# ==============================================================================
+
+# Dataset (Local only - NEVER commit raw/proprietary dataset)
+train/
+Test_NoisyLR/
+*.npy
+__MACOSX/
+._*
+
+# Python & Virtual Environments
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+
+# Training Logs, Redundant Checkpoints & Temporary Artifacts
+experiments/
+runs/
+logs/
+checkpoints/*.pth
+!checkpoints/best_overall.pth
+*.pt
+*.ckpt
+*.log
+
+# Outputs & Exported Binaries
+outputs/
+test_outputs/
+val_outputs/
+*.onnx
+
+# IDE & Editor Configs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS Metadata
+.DS_Store
+Thumbs.db
+
+# Temporary Files
+*.tmp
+*.temp
+scratch/
