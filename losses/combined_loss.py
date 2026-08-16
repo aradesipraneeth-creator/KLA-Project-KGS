@@ -10,10 +10,7 @@ import torch.nn as nn
 try:
     from .charbonnier_loss import CharbonnierLoss
 except ImportError:
-    try:
-        from .charbonnier import CharbonnierLoss
-    except ImportError:
-        from losses.charbonnier_loss import CharbonnierLoss
+    from losses.charbonnier_loss import CharbonnierLoss
 
 try:
     from .ssim_loss import SSIMLoss
