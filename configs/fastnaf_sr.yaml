@@ -10,8 +10,8 @@ model:
   upscale_factor: 2
 
 data:
-  train_root: "train/train"
-  test_root: "Test_NoisyLR/NoisyLR"
+  train_root: "train"
+  test_root: "Test_NoisyLR"
   val_split: 0.1
   seed: 42
   patch_size: null  # null uses full 128x128 -> 256x256; or 64 for patch training

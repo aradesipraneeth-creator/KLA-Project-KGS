@@ -141,7 +141,15 @@ def validate(model, val_loader, criterion, device, lpips_fn=None):
     }
 
 
-def train_pipeline(config_path="configs/fastnaf_sr.yaml", resume_ckpt=None, override_epochs=None, override_batch_size=None):
+def train_pipeline(
+    config_path="configs/fastnaf_sr.yaml",
+    resume_ckpt=None,
+    override_epochs=None,
+    override_batch_size=None,
+    override_train_root=None,
+    override_lr_dir=None,
+    override_gt_dir=None,
+):
     with open(config_path, "r") as f:
         cfg = yaml.safe_load(f)
 
@@ -150,6 +158,8 @@ def train_pipeline(config_path="configs/fastnaf_sr.yaml", resume_ckpt=None, over
         cfg["training"]["epochs"] = override_epochs
     if override_batch_size is not None:
         cfg["data"]["batch_size"] = override_batch_size
+    if override_train_root is not None:
+        cfg["data"]["train_root"] = override_train_root
 
     seed = cfg["data"].get("seed", 42)
     set_seed(seed)
@@ -168,16 +178,64 @@ def train_pipeline(config_path="configs/fastnaf_sr.yaml", resume_ckpt=None, over
     with open(os.path.join(exp_dir, "config.yaml"), "w") as f:
         yaml.dump(cfg, f)
 
-    # Discover and split dataset
-    train_root = cfg["data"]["train_root"]
-    lr_dir = os.path.join(train_root, "NoisyLR")
-    gt_dir = os.path.join(train_root, "GT")
+    # Robust discovery of NoisyLR and GT directories
+    raw_train_root = cfg["data"].get("train_root", "train")
+
+    possible_lr_dirs = []
+    if override_lr_dir:
+        possible_lr_dirs.append(override_lr_dir)
+    possible_lr_dirs.extend([
+        os.path.join(raw_train_root, "NoisyLR"),
+        os.path.join(raw_train_root, "train", "NoisyLR"),
+        "train/NoisyLR",
+        "train/train/NoisyLR",
+        "./train/NoisyLR",
+        "./train/train/NoisyLR",
+        "NoisyLR",
+    ])
+
+    possible_gt_dirs = []
+    if override_gt_dir:
+        possible_gt_dirs.append(override_gt_dir)
+    possible_gt_dirs.extend([
+        os.path.join(raw_train_root, "GT"),
+        os.path.join(raw_train_root, "train", "GT"),
+        "train/GT",
+        "train/train/GT",
+        "./train/GT",
+        "./train/train/GT",
+        "GT",
+    ])
+
+    lr_dir = None
+    for p in possible_lr_dirs:
+        if os.path.isdir(p) and len(get_clean_npy_filelist(p)) > 0:
+            lr_dir = p
+            break
+
+    gt_dir = None
+    for p in possible_gt_dirs:
+        if os.path.isdir(p) and len(get_clean_npy_filelist(p)) > 0:
+            gt_dir = p
+            break
+
+    if lr_dir is None or gt_dir is None:
+        raise FileNotFoundError(
+            f"Could not locate paired NoisyLR and GT folders.\n"
+            f"Searched LR candidates: {possible_lr_dirs}\n"
+            f"Searched GT candidates: {possible_gt_dirs}\n"
+            f"Please specify --train_root (e.g. --train_root train) or --lr_dir and --gt_dir."
+        )
 
     lr_files = set(get_clean_npy_filelist(lr_dir))
     gt_files = set(get_clean_npy_filelist(gt_dir))
     common_files = sorted(list(lr_files.intersection(gt_files)))
 
-    assert len(common_files) > 0, f"No paired training data found in {train_root}"
+    assert len(common_files) > 0, (
+        f"No paired training data found between:\n"
+        f"  LR dir: {lr_dir} ({len(lr_files)} files)\n"
+        f"  GT dir: {gt_dir} ({len(gt_files)} files)"
+    )
 
     # Deterministic split
     val_ratio = cfg["data"].get("val_split", 0.1)
@@ -488,6 +546,9 @@ if __name__ == "__main__":
     parser.add_argument("--resume", default=None, help="Path to checkpoint to resume from")
     parser.add_argument("--epochs", type=int, default=None, help="Override epochs")
     parser.add_argument("--batch_size", type=int, default=None, help="Override batch size")
+    parser.add_argument("--train_root", default=None, help="Path to train data directory containing NoisyLR and GT")
+    parser.add_argument("--lr_dir", default=None, help="Direct path to NoisyLR folder")
+    parser.add_argument("--gt_dir", default=None, help="Direct path to GT folder")
     args = parser.parse_args()
 
     train_pipeline(
@@ -495,4 +556,7 @@ if __name__ == "__main__":
         resume_ckpt=args.resume,
         override_epochs=args.epochs,
         override_batch_size=args.batch_size,
+        override_train_root=args.train_root,
+        override_lr_dir=args.lr_dir,
+        override_gt_dir=args.gt_dir,
     )

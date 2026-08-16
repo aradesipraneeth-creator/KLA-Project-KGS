@@ -29,7 +29,7 @@ from evaluate import find_default_checkpoint
 
 
 def generate_submission_outputs(
-    input_dir="Test_NoisyLR/NoisyLR",
+    input_dir="Test_NoisyLR",
     output_dir="test_outputs",
     checkpoint_path=None,
     batch_size=16,
@@ -39,6 +39,27 @@ def generate_submission_outputs(
         device = torch.device(device_name)
     else:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    # Smart discovery of test files directory
+    candidates = [
+        input_dir,
+        os.path.join(input_dir, "NoisyLR"),
+        "Test_NoisyLR",
+        "Test_NoisyLR/NoisyLR",
+        "./Test_NoisyLR",
+        "./Test_NoisyLR/NoisyLR",
+        "NoisyLR",
+        "test",
+        "test/NoisyLR",
+    ]
+    resolved_input_dir = None
+    for c in candidates:
+        if os.path.isdir(c) and len(get_clean_npy_filelist(c)) > 0:
+            resolved_input_dir = c
+            break
+
+    if resolved_input_dir is not None:
+        input_dir = resolved_input_dir
 
     print("=" * 65)
     print("GENERATING FINAL TEST OUTPUTS & SUBMISSION MANIFEST")
@@ -171,7 +192,7 @@ def generate_submission_outputs(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate Test Outputs")
-    parser.add_argument("--input_dir", default="Test_NoisyLR/NoisyLR", help="Input test folder")
+    parser.add_argument("--input_dir", default="Test_NoisyLR", help="Input test folder (e.g. Test_NoisyLR or Test_NoisyLR/NoisyLR)")
     parser.add_argument("--output_dir", default="test_outputs", help="Output folder")
     parser.add_argument("--checkpoint", default=None, help="Path to checkpoint")
     parser.add_argument("--batch_size", type=int, default=16, help="Batch size for inference")

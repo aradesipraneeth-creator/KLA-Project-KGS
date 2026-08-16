@@ -80,6 +80,21 @@ def run_evaluation(
     else:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+    # Smart discovery of input_dir if needed
+    candidates = [
+        input_dir,
+        os.path.join(input_dir, "NoisyLR"),
+        "Test_NoisyLR",
+        "Test_NoisyLR/NoisyLR",
+        "./Test_NoisyLR",
+        "./Test_NoisyLR/NoisyLR",
+        "NoisyLR",
+    ]
+    for c in candidates:
+        if c and os.path.isdir(c) and len(get_clean_npy_filelist(c)) > 0:
+            input_dir = c
+            break
+
     print("=" * 65)
     print("KLA SEMICONDUCTOR RESTORATION — EVALUATION PIPELINE")
     print("=" * 65)
