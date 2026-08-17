@@ -1,0 +1,31 @@
+=====================================================================
+KLA SEMICONDUCTOR DATASET VALIDATION REPORT
+=====================================================================
+Reference Global Mean:  0.43353602
+Reference Global Std:   0.28478748
+
+--- Training Set Integrity ---
+Total LR Files:         3200
+Total GT Files:         3200
+Valid Paired Samples:   3200
+Inspected Pairs:        3200
+Valid 2x Scaled Pairs:  3200
+Invalid Pairs:          0
+Corrupt / NaN / Inf:    0 / 0 / 0
+LR Shapes:              [(128, 128)]
+GT Shapes:              [(256, 256)]
+LR Value Range:         [-0.2786, 2.1580]
+GT Value Range:         [0.0000, 1.0000]
+LR Measured Mean / Std: 0.43353629 / 0.20579526
+GT Measured Mean / Std: 0.43352844 / 0.18762914
+
+--- Test Set Integrity ---
+Total Test Files:       400
+Test Shapes:            [(128, 128)]
+Test Value Range:       [-0.2249, 2.1580]
+Test Measured Mean:     0.44274203
+Test NaN / Inf Files:   0 / 0
+
+=====================================================================
+Status: [PASSED] All dataset integrity checks passed cleanly!
+=====================================================================

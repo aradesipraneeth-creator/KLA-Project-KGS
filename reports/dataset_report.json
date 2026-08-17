@@ -1,0 +1,54 @@
+{
+    "reference_statistics": {
+        "mean": 0.43353602,
+        "std": 0.28478748
+    },
+    "train_set": {
+        "total_lr_files": 3200,
+        "total_gt_files": 3200,
+        "paired_samples": 3200,
+        "inspected_samples": 3200,
+        "valid_2x_pairs": 3200,
+        "invalid_pairs": 0,
+        "missing_gt": 0,
+        "missing_lr": 0,
+        "corrupt_files": 0,
+        "nan_files": 0,
+        "inf_files": 0,
+        "lr_shapes": [
+            [128, 128]
+        ],
+        "gt_shapes": [
+            [256, 256]
+        ],
+        "lr_dtypes": [
+            "float32"
+        ],
+        "gt_dtypes": [
+            "float32"
+        ],
+        "lr_min": -0.2786,
+        "lr_max": 2.1580,
+        "gt_min": 0.0000,
+        "gt_max": 1.0000,
+        "lr_mean": 0.43353629,
+        "lr_std": 0.20579526,
+        "gt_mean": 0.43352844,
+        "gt_std": 0.18762914
+    },
+    "test_set": {
+        "total_test_files": 400,
+        "shapes": [
+            [128, 128]
+        ],
+        "dtypes": [
+            "float32"
+        ],
+        "nan_files": 0,
+        "inf_files": 0,
+        "min": -0.2249,
+        "max": 2.1580,
+        "mean": 0.44274203
+    },
+    "validation_passed": true
+}

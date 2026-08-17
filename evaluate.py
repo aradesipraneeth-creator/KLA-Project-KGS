@@ -47,6 +47,7 @@ def find_default_checkpoint():
         "checkpoints/best_psnr.pth",
         "checkpoints/best_ssim.pth",
         "checkpoints/latest.pth",
+        "fastnaf_sr.pt",
     ]
     for c in candidates:
         if os.path.exists(c):
@@ -258,9 +259,13 @@ if __name__ == "__main__":
     parser.add_argument("--batch_size", type=int, default=16, help="Inference batch size")
     parser.add_argument("--tile_size", type=int, default=128, help="Tile size for large images")
     parser.add_argument("--tile_overlap", type=int, default=16, help="Tile overlap in pixels")
+    parser.add_argument("--overlap", type=int, default=None, help="Alias for tile_overlap in pixels")
+    parser.add_argument("--fp16", action="store_true", help="Enable FP16 autocast during evaluation")
     parser.add_argument("--device", default=None, help="Device (cuda or cpu)")
     parser.add_argument("--no_ema", action="store_true", help="Do not use EMA weights")
     args = parser.parse_args()
+
+    effective_overlap = args.overlap if args.overlap is not None else args.tile_overlap
 
     run_evaluation(
         input_dir=args.input_dir,
@@ -269,7 +274,7 @@ if __name__ == "__main__":
         gt_dir=args.gt_dir,
         batch_size=args.batch_size,
         tile_size=args.tile_size,
-        tile_overlap=args.tile_overlap,
+        tile_overlap=effective_overlap,
         device_name=args.device,
         use_ema=not args.no_ema,
     )

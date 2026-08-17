@@ -123,10 +123,16 @@ python scripts/sanity_check.py
 
 ## 7. Model Training
 
-Train the FastNAF-SR V5 network using the default configuration (AMP FP16, AdamW optimizer, Cosine Annealing scheduler, Model EMA, and multi-component Charbonnier + SSIM + Edge loss):
+Train the FastNAF-SR V5 network using the final production configuration (AMP FP16, AdamW optimizer, Cosine Annealing scheduler, Model EMA, and multi-component Charbonnier + SSIM + Edge loss):
 
 ```bash
-python train.py --config configs/fastnaf_sr.yaml
+python train.py --config configs/final.yaml
+```
+
+To resume training from a saved checkpoint:
+
+```bash
+python train.py --config configs/final.yaml --resume checkpoints/latest.pth
 ```
 
 ---
@@ -137,8 +143,8 @@ python train.py --config configs/fastnaf_sr.yaml
 
 ```bash
 python evaluate.py \
-    --input_dir ./Test_NoisyLR/NoisyLR \
-    --output_dir ./test_outputs
+    --input_dir PATH_TO_TEST_IMAGES \
+    --output_dir PATH_TO_OUTPUT
 ```
 
 ### Full Argument Options
@@ -151,17 +157,28 @@ python evaluate.py --help
 |:---|:---|:---|
 | `--input_dir` | Path to input directory containing `.npy` images | **Required** |
 | `--output_dir` | Path to destination directory to save restored `.npy` files | **Required** |
-| `--checkpoint` | Path to specific `.pth` model checkpoint | Auto-resolves (`checkpoints/best_overall.pth`) |
+| `--checkpoint` | Path to specific `.pth` or `.pt` model checkpoint | Auto-resolves (`checkpoints/best_overall.pth` / `fastnaf_sr.pt`) |
 | `--gt_dir` | Optional path to ground truth directory for metric calculation | `None` |
 | `--batch_size` | Inference batch size for uniform $128 \times 128$ images | `16` |
 | `--tile_size` | Tile size for large non-standard input images | `128` |
-| `--tile_overlap` | Pixel overlap between adjacent tiles | `16` |
+| `--tile_overlap` / `--overlap` | Pixel overlap between adjacent tiles | `16` |
+| `--fp16` | Enable FP16 autocast during evaluation | `False` |
 | `--device` | Compute device (`cuda` or `cpu`) | Auto-detect |
 | `--no_ema` | Disable EMA weights and use raw model weights | `False` |
 
 ---
 
-## 9. Benchmark
+## 9. Interactive Streamlit Dashboard
+
+Run the interactive web application for visual inspection, image restoration, and real-time metric analysis:
+
+```bash
+streamlit run app.py
+```
+
+---
+
+## 10. Benchmark
 
 Measure model latency, peak GPU VRAM, parameter counts, and FPS throughput across FP32 and FP16:
 
@@ -171,7 +188,7 @@ python benchmark.py
 
 ---
 
-## 10. ONNX Model Export
+## 11. ONNX Model Export
 
 Export the trained model to ONNX format with dynamic spatial and batch axes, and numerically verify outputs against PyTorch:
 
@@ -181,7 +198,7 @@ python export_onnx.py --output fastnaf_sr.onnx
 
 ---
 
-## 11. Model Checkpoints & Weights
+## 12. Model Checkpoints & Weights
 
 The FastNAF-SR V5 model is lightweight (~378K parameters, ~2.5 MB). The best pre-trained checkpoint is provided directly in the repository at:
 
@@ -193,7 +210,7 @@ When running `evaluate.py` or `infer.py`, the scripts will automatically find an
 
 ---
 
-## 12. Repository Structure
+## 13. Repository Structure
 
 ```text
 KLA-Project-KGS/
@@ -208,6 +225,7 @@ KLA-Project-KGS/
 ├── infer.py                  # Single-image quick inference CLI
 ├── benchmark.py              # Latency, FPS, VRAM & parameter benchmarking suite
 ├── export_onnx.py            # Dynamic ONNX export & verification
+├── app.py                    # Interactive Streamlit inspection dashboard
 │
 ├── models/
 │   ├── __init__.py           # Model exports
@@ -233,6 +251,7 @@ KLA-Project-KGS/
 │   └── lpips_metric.py       # Learned Perceptual Patch Similarity
 │
 ├── configs/
+│   ├── final.yaml            # Final production hyperparameter configuration
 │   └── fastnaf_sr.yaml       # Hyperparameters and model configuration
 │
 ├── scripts/
@@ -255,6 +274,6 @@ KLA-Project-KGS/
 
 ---
 
-## 13. License
+## 14. License
 
 This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.

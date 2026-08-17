@@ -1,0 +1,74 @@
+# =====================================================================
+# FastNAF-SR V5 Final Production Configuration
+# Project: KLA Semiconductor AI Image Restoration (KGS)
+# Architecture: 48 channels, 8 LR NAF Blocks, PixelShuffle 2x, 4 HR NAF Blocks
+# =====================================================================
+
+model:
+  name: "FastNAFSR_V5"
+  in_channels: 1
+  out_channels: 1
+  channels: 48
+  num_lr_blocks: 8
+  num_hr_blocks: 4
+  upscale_factor: 2
+
+data:
+  train_root: "train"
+  test_root: "Test_NoisyLR"
+  val_split: 0.1
+  seed: 42
+  patch_size: 64  # Configurable patch size (64x64 LR -> 128x128 GT) or null for full image
+  augment: true
+  num_workers: 0  # 0 for safe cross-platform execution
+  batch_size: 8
+  val_batch_size: 8
+  global_mean: 0.43353602
+  global_std: 0.28478748
+
+optimizer:
+  name: "AdamW"
+  lr: 2.0e-4
+  weight_decay: 1.0e-4
+  betas: [0.9, 0.99]
+  eps: 1.0e-8
+
+scheduler:
+  type: "cosine"
+  warmup_epochs: 3
+  min_lr: 1.0e-6
+
+loss:
+  recon_type: "charbonnier"
+  charbonnier_weight: 1.0
+  ssim_weight: 0.5
+  edge_weight: 0.05
+  lambda_recon: 1.0
+  lambda_ssim: 0.5
+  lambda_edge: 0.05
+  edge_mode: "sobel"
+
+training:
+  epochs: 30
+  lr: 2.0e-4
+  min_lr: 1.0e-6
+  weight_decay: 1.0e-4
+  warmup_epochs: 3
+  grad_clip: 1.0
+  gradient_clip_norm: 1.0
+  amp: true
+  ema: true
+  ema_decay: 0.999
+  checkpoint_frequency: 1
+  validation_frequency: 1
+  save_dir: "checkpoints"
+  log_dir: "experiments"
+  early_stopping:
+    enabled: true
+    patience: 10
+    monitor: "psnr"
+
+inference:
+  tile_size: 128
+  tile_overlap: 16
+  use_ema: true

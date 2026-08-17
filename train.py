@@ -262,8 +262,8 @@ def train_pipeline(
     print(f"Train Samples:        {len(train_files)}")
     print(f"Val Samples:          {len(val_files)}")
     print(f"Batch Size:           {cfg['data']['batch_size']}")
-    print(f"Epochs:               {cfg['training']['epochs']}")
-    print(f"Learning Rate:        {cfg['training']['lr']}")
+    print(f"Epochs:               {cfg['training'].get('epochs', 30)}")
+    print(f"Learning Rate:        {cfg['training'].get('lr', cfg.get('optimizer', {}).get('lr', 1e-3))}")
     print(f"Experiment Directory: {exp_dir}")
     print("-" * 65)
 
@@ -327,11 +327,11 @@ def train_pipeline(
     ).to(device)
 
     # Optimizer & Scheduler
-    epochs = cfg["training"]["epochs"]
-    lr = cfg["training"]["lr"]
-    min_lr = cfg["training"].get("min_lr", 1e-6)
-    weight_decay = cfg["training"].get("weight_decay", 1e-4)
-    warmup_epochs = cfg["training"].get("warmup_epochs", 3)
+    epochs = cfg["training"].get("epochs", 30)
+    lr = cfg["training"].get("lr", cfg.get("optimizer", {}).get("lr", 1e-3))
+    min_lr = cfg["training"].get("min_lr", cfg.get("scheduler", {}).get("min_lr", 1e-6))
+    weight_decay = cfg["training"].get("weight_decay", cfg.get("optimizer", {}).get("weight_decay", 1e-4))
+    warmup_epochs = cfg["training"].get("warmup_epochs", cfg.get("scheduler", {}).get("warmup_epochs", 3))
 
     optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
 
@@ -542,7 +542,7 @@ def train_pipeline(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train FastNAF-SR V5")
-    parser.add_argument("--config", default="configs/fastnaf_sr.yaml", help="Path to YAML config")
+    parser.add_argument("--config", default="configs/final.yaml", help="Path to YAML config")
     parser.add_argument("--resume", default=None, help="Path to checkpoint to resume from")
     parser.add_argument("--epochs", type=int, default=None, help="Override epochs")
     parser.add_argument("--batch_size", type=int, default=None, help="Override batch size")

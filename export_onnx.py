@@ -63,7 +63,6 @@ def export_to_onnx(
                 "input": {0: "batch_size", 2: "height", 3: "width"},
                 "output": {0: "batch_size", 2: "height_2x", 3: "width_2x"},
             },
-            dynamo=False,
         )
         print(f"Exported successfully! File size: {os.path.getsize(output_onnx) / (1024 * 1024):.2f} MB")
     except Exception as e:
